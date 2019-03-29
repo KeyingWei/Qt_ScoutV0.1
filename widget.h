@@ -37,10 +37,10 @@ private:
     uint8_t key_Flag;
     void create_file(QString filePath,QString fileName);
     QString logfileDir;
+    int8_t angle_speed = 0;
+    int8_t line_speed  = 0;
 
 private slots:
-   void Onset_angle_speed_Click();
-   void Onset_line_speed_Click();
    void Onclean_battery_low_vol_error_Click();
    void Onclean_battery_over_vol_error_Click();
    void Onclean_motor_over_curr_error_Click();
@@ -52,6 +52,23 @@ private slots:
    void onCtr_source_switch_currentIndexChanged(int index);
    void onKey_Mouse_Ctrl_Mode_Enable_Click();
    void OnStartOrStopButton_Click();
+
+   void OnlinespeedAdd1Click();
+   void OnlinespeedAdd10Click();
+   void OnanglespeedAdd1Click();
+   void OnanglespeedAdd10Click();
+
+   void OnlinespeedSub1Click();
+   void OnlinespeedSub10Click();
+   void OnanglespeedSub1Click();
+   void OnanglespeedSub10Click();
+
+   void LineEditChangeLineSpeed();
+   void LineEditChangeAngleSpeed();
+
+
+   void SetLineSpeed(int value);
+   void SetAngleSpeed(int value);
 
    void Dispaly_FeedBack();
    void KeyChangeCtrlVal();

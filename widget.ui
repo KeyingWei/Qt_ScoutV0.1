@@ -58,27 +58,79 @@
    <property name="title">
     <string>线速度控制</string>
    </property>
-   <widget class="QLineEdit" name="line_speed">
+   <widget class="QSlider" name="linespeed_spit">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>80</x>
       <y>30</y>
-      <width>281</width>
-      <height>31</height>
+      <width>201</width>
+      <height>41</height>
      </rect>
     </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
    </widget>
-   <widget class="QPushButton" name="set_line_speed">
+   <widget class="QPushButton" name="line_speed_sub1">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>30</y>
-      <width>131</width>
-      <height>31</height>
+      <x>50</x>
+      <y>40</y>
+      <width>31</width>
+      <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>设置线速度百分比</string>
+     <string>-</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="line_speed_sub10">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>31</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>--</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="line_speed_add10">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>40</y>
+      <width>31</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>++</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="line_speed_add1">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>40</y>
+      <width>31</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="line_speed_value">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>40</y>
+      <width>61</width>
+      <height>23</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -94,27 +146,79 @@
    <property name="title">
     <string>角速度控制</string>
    </property>
-   <widget class="QLineEdit" name="angle_speed">
+   <widget class="QSlider" name="anglespeed_spit">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>70</x>
       <y>30</y>
-      <width>281</width>
-      <height>31</height>
+      <width>201</width>
+      <height>41</height>
      </rect>
     </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
    </widget>
-   <widget class="QPushButton" name="set_angle_speed">
+   <widget class="QPushButton" name="angle_speed_add10">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>30</y>
-      <width>131</width>
-      <height>31</height>
+      <x>300</x>
+      <y>40</y>
+      <width>31</width>
+      <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>设置角速度百分比</string>
+     <string>++</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="angle_speed_sub10">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>31</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>--</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="angle_speed_value">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>40</y>
+      <width>61</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="angle_speed_add1">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>40</y>
+      <width>31</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="angle_speed_sub1">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>40</y>
+      <width>31</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>-</string>
     </property>
    </widget>
   </widget>

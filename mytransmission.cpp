@@ -58,7 +58,7 @@ void myTransmission::Send_cmd(uint8_t cmy_type,uint8_t data)
     QByteArray temp;
     temp.append(send_buff,send_buff[2]);
     emit serial->WriteData(temp);
-    qDebug()<<"发送控制数据成功";
+    qDebug("发送控制数据成功,命令类型:0x%x,数据:%d",cmy_type,(int8_t)data);
 }
 
 unsigned short myTransmission::crc16_calc(unsigned char *buf, int length)

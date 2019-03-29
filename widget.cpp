@@ -45,8 +45,6 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->key_mouse_enable,&QPushButton::clicked,this,&Widget::onKey_Mouse_Ctrl_Mode_Enable_Click);
-    connect(ui->set_angle_speed,&QPushButton::clicked,this,&Widget::Onset_angle_speed_Click);
-    connect(ui->set_line_speed,&QPushButton::clicked,this,&Widget::Onset_line_speed_Click);
     connect(ui->clean_battery_low_vol_error,&QPushButton::clicked,this,&Widget::Onclean_battery_low_vol_error_Click);
     connect(ui->clean_battery_over_vol_error,&QPushButton::clicked,this,&Widget::Onclean_battery_over_vol_error_Click);
     connect(ui->clean_motor_over_curr_error,&QPushButton::clicked,this,&Widget::Onclean_motor_over_curr_error_Click);
@@ -57,6 +55,19 @@ Widget::Widget(QWidget *parent) :
     connect(ui->clean_motot4_commu_error,&QPushButton::clicked,this,&Widget::Onclean_motot4_commu_error_Click);
     connect(ui->StartOrStopButton_3,&QPushButton::clicked,this,&Widget::OnStartOrStopButton_Click);
     connect(ui->ctrl_mode,SIGNAL(currentIndexChanged(int)),this,SLOT(onCtr_source_switch_currentIndexChanged(int)));
+    connect(ui->anglespeed_spit,SIGNAL(valueChanged(int)),this,SLOT(SetAngleSpeed(int)));
+    connect(ui->linespeed_spit,SIGNAL(valueChanged(int)),this,SLOT(SetLineSpeed(int)));
+    connect(ui->line_speed_add1,&QPushButton::clicked,this,&Widget::OnlinespeedAdd1Click);
+    connect(ui->line_speed_add10,&QPushButton::clicked,this,&Widget::OnlinespeedAdd10Click);
+    connect(ui->angle_speed_add1,&QPushButton::clicked,this,&Widget::OnanglespeedAdd1Click);
+    connect(ui->angle_speed_add10,&QPushButton::clicked,this,&Widget::OnanglespeedAdd10Click);
+    connect(ui->line_speed_sub1,&QPushButton::clicked,this,&Widget::OnlinespeedSub1Click);
+    connect(ui->line_speed_sub10,&QPushButton::clicked,this,&Widget::OnlinespeedSub10Click);
+    connect(ui->angle_speed_sub1,&QPushButton::clicked,this,&Widget::OnanglespeedSub1Click);
+    connect(ui->angle_speed_sub10,&QPushButton::clicked,this,&Widget::OnanglespeedSub10Click);
+    connect(ui->angle_speed_value,SIGNAL(editingFinished()),this,SLOT(LineEditChangeAngleSpeed()));
+    connect(ui->line_speed_value,SIGNAL(editingFinished()),this,SLOT(LineEditChangeLineSpeed()));
+
 
     /*设置界面风格为暗黑*/
     qApp->setStyle(QStyleFactory::create("Fusion"));
@@ -95,9 +106,6 @@ Widget::Widget(QWidget *parent) :
 
 
 
-
-    ui->set_angle_speed->setStyleSheet(set_button_style);
-    ui->set_line_speed->setStyleSheet(set_button_style);
     ui->clean_battery_low_vol_error->setStyleSheet(set_button_style);
     ui->clean_battery_over_vol_error->setStyleSheet(set_button_style);
     ui->clean_motor_over_curr_error->setStyleSheet(set_button_style);
@@ -108,9 +116,8 @@ Widget::Widget(QWidget *parent) :
     ui->clean_motot4_commu_error->setStyleSheet(set_button_style);
     ui->key_mouse_enable->setStyleSheet(open_button_style);
 
-    ui->line_speed->setText(tr("请输入线速度值，范围正负100"));
-    ui->angle_speed->setText(tr("请输入角速度值，范围正负100"));
-
+    ui->angle_speed_value->setText("0");
+    ui->line_speed_value->setText("0");
 
 
     timer = new QTimer(this);//创建一个定时器
@@ -160,6 +167,15 @@ Widget::Widget(QWidget *parent) :
          qDebug()<<"打开文件失败";
      }
 
+     ui->anglespeed_spit->setRange(-100,100);
+     ui->anglespeed_spit->setSingleStep(1);
+     ui->linespeed_spit->setRange(-100,100);
+     ui->linespeed_spit->setSingleStep(1);
+
+     ui->anglespeed_spit->setValue(0);
+     ui->linespeed_spit->setValue(0);
+
+
 
 
 
@@ -179,73 +195,60 @@ void Widget::keyPressEvent(QKeyEvent *event)
         key_Flag = 1;
         if(transmission->keyMouse == 1)
         {
-           transmission->line_speed += 10;
+          line_speed += 10;
 
-           if(transmission->line_speed >=  100)
-               transmission->line_speed  = 100;
+           if(line_speed >=  100)
+               line_speed  = 100;
 
-           ui->line_speed->setText(QString::number(transmission->line_speed));
-           transmission->Send_cmd(0x12,transmission->line_speed);
-           qDebug()<<" line spedd :" <<transmission->line_speed;
+           transmission->Send_cmd(0x12,line_speed);
+           ui->line_speed_value->setText(QString::number(line_speed));
+           ui->linespeed_spit->setValue(line_speed);
+           qDebug()<<" line spedd :" <<line_speed;
         }
         break;
 
       case Qt::Key_S:
         if(transmission->keyMouse == 1)
         {
-           transmission->line_speed -= 10;
+            line_speed -= 10;
 
-           if(transmission->line_speed <= -100)
-               transmission->line_speed  = -100;
+           if(line_speed <= -100)
+               line_speed  = -100;
 
-           ui->line_speed->setText(QString::number(transmission->line_speed));
-           transmission->Send_cmd(0x12,transmission->line_speed);
-           qDebug()<<" line spedd :" <<transmission->line_speed;
+           transmission->Send_cmd(0x12,line_speed);
+           qDebug()<<" line spedd :" <<line_speed;
+           ui->line_speed_value->setText(QString::number(line_speed));
+           ui->linespeed_spit->setValue(line_speed);
         }
          break;
 
       case Qt::Key_A:
         if(transmission->keyMouse == 1)
         {
-           transmission->angle_speed += 10;
+            angle_speed += 10;
 
-           if(transmission->angle_speed >= 100)
-               transmission->angle_speed = 100;
+           if( angle_speed >= 100)
+                angle_speed = 100;
 
-            ui->angle_speed->setText(QString::number(transmission->angle_speed));
-            transmission->Send_cmd(0x11,transmission->angle_speed);
-            qDebug()<<" angle spedd :" <<transmission->angle_speed;
+            transmission->Send_cmd(0x11,angle_speed);
+            qDebug()<<" angle spedd :" <<angle_speed;
+            ui->angle_speed_value->setText(QString::number(angle_speed));
+            ui->anglespeed_spit->setValue(angle_speed);
         }
          break;
 
       case Qt::Key_D:
         if(transmission->keyMouse == 1)
         {
-           transmission->angle_speed -= 10;
+            angle_speed -= 10;
 
-           if(transmission->angle_speed <= -100)
-               transmission->angle_speed  = -100;
+           if( angle_speed <= -100)
+                angle_speed  = -100;
 
-            ui->angle_speed->setText(QString::number(transmission->angle_speed));
-            transmission->Send_cmd(0x11,transmission->angle_speed);
-            qDebug()<<" angle spedd :" <<transmission->angle_speed;
-        }
-       case Qt::Key_Q:
-           if(transmission->keyMouse == 1)
-           {
-               transmission->line_speed  = 0;
-               transmission->Send_cmd(0x12,transmission->line_speed);
-               ui->line_speed->setText(QString::number(transmission->line_speed));
-               qDebug()<<" line spedd :" <<transmission->line_speed;
-           }
-        break;
-    case Qt::Key_E:
-        if(transmission->keyMouse == 1)
-        {
-            transmission->angle_speed  = 0;
-            ui->angle_speed->setText(QString::number(transmission->angle_speed));
-            transmission->Send_cmd(0x11,transmission->angle_speed);
-            qDebug()<<" angle spedd :" <<transmission->angle_speed;
+            transmission->Send_cmd(0x11,angle_speed);
+            qDebug()<<" angle spedd :" <<angle_speed;
+            ui->angle_speed_value->setText(QString::number(angle_speed));
+            ui->anglespeed_spit->setValue(angle_speed);
         }
      break;
 
@@ -265,10 +268,11 @@ void Widget::keyReleaseEvent(QKeyEvent *event)
        {
            if(event->isAutoRepeat())
                return;
-           transmission->line_speed  = 0;
-           transmission->Send_cmd(0x12,transmission->line_speed);
-           ui->line_speed->setText(QString::number(transmission->line_speed));
-           qDebug()<<" line spedd :" <<transmission->line_speed;
+            line_speed  = 0;
+           transmission->Send_cmd(0x12, line_speed);
+           qDebug()<<" line spedd :" <<line_speed;
+           ui->line_speed_value->setText(QString::number(line_speed));
+           ui->linespeed_spit->setValue(line_speed);
        }
 
           break;
@@ -278,27 +282,17 @@ void Widget::keyReleaseEvent(QKeyEvent *event)
        {
            if(event->isAutoRepeat())
                return;
-           transmission->angle_speed  = 0;
-           ui->angle_speed->setText(QString::number(transmission->angle_speed));
-           transmission->Send_cmd(0x11,transmission->angle_speed);
-           qDebug()<<" angle spedd :" <<transmission->angle_speed;
+            angle_speed  = 0;
+           transmission->Send_cmd(0x11, angle_speed);
+           qDebug()<<" angle spedd :" << angle_speed;
+           ui->angle_speed_value->setText(QString::number(angle_speed));
+           ui->anglespeed_spit->setValue(angle_speed);
        }
 
         break;
    }
 }
 
-void Widget::Onset_angle_speed_Click()
-{
-    transmission->angle_speed = ui->angle_speed->text().toInt();
-    transmission->Send_cmd(0x11,transmission->angle_speed);
-}
-
-void Widget::Onset_line_speed_Click()
-{
-    transmission->line_speed = ui->line_speed->text().toInt();
-    transmission->Send_cmd(0x12,transmission->line_speed);
-}
 
 void Widget::Onclean_battery_low_vol_error_Click()
 {
@@ -362,20 +356,13 @@ void Widget::onKey_Mouse_Ctrl_Mode_Enable_Click()
         transmission->keyMouse = 1;
         ui->key_mouse_enable->setText(tr("失能"));
         ui->key_mouse_enable->setStyleSheet(close_button_style);
-        ui->line_speed->setReadOnly(true);
-        ui->angle_speed->setReadOnly(true);
-        ui->key_note->setText(tr("W增加线速度 S减 Q清零线速度; A增加角速度 D减 E清零角速度"));
+        ui->key_note->setText(tr("W增加线速度 S减  ; A增加角速度 D减  "));
     }
     else
     {
         transmission->keyMouse = 0;
         ui->key_mouse_enable->setText(tr("使能"));
         ui->key_mouse_enable->setStyleSheet(open_button_style);
-        ui->line_speed->setReadOnly(false);
-        ui->angle_speed->setReadOnly(false);
-
-        ui->line_speed->setText(tr("请输入线速度值，范围正负100"));
-        ui->angle_speed->setText(tr("请输入角速度值，范围正负100"));
 
         ui->key_note->clear();
     }
@@ -417,6 +404,115 @@ void Widget::OnStartOrStopButton_Click()
         ui->StartOrStopButton_3->setText(tr("打开串口"));
     }
 
+}
+
+void Widget::OnlinespeedAdd1Click()
+{
+   line_speed++;
+   if(line_speed >= 100)
+       line_speed = 100;
+   ui->line_speed_value->setText(QString::number(line_speed));
+   ui->linespeed_spit->setValue(line_speed);
+   transmission->Send_cmd(0x12,line_speed);
+}
+
+void Widget::OnlinespeedAdd10Click()
+{
+    line_speed += 10;
+    if(line_speed >=100)
+        line_speed = 100;
+    ui->line_speed_value->setText(QString::number(line_speed));
+    ui->linespeed_spit->setValue(line_speed);
+    transmission->Send_cmd(0x12,line_speed);
+}
+
+void Widget::OnanglespeedAdd1Click()
+{
+   angle_speed++;
+   if(angle_speed >= 100)
+       angle_speed = 100;
+   ui->angle_speed_value->setText(QString::number(angle_speed));
+   ui->anglespeed_spit->setValue(angle_speed);
+   transmission->Send_cmd(0x11,angle_speed);
+}
+
+void Widget::OnanglespeedAdd10Click()
+{
+    angle_speed += 10;
+    if(angle_speed >= 100)
+        angle_speed = 100;
+    ui->angle_speed_value->setText(QString::number(angle_speed));
+    ui->anglespeed_spit->setValue(angle_speed);
+    transmission->Send_cmd(0x11,angle_speed);
+}
+
+void Widget::OnlinespeedSub1Click()
+{
+    line_speed--;
+    if(line_speed <= - 100)
+        line_speed = -100;
+    ui->line_speed_value->setText(QString::number(line_speed));
+    ui->linespeed_spit->setValue(line_speed);
+    transmission->Send_cmd(0x12,line_speed);
+}
+
+void Widget::OnlinespeedSub10Click()
+{
+    line_speed -= 10;
+    if(line_speed <= - 100)
+        line_speed = -100;
+    ui->line_speed_value->setText(QString::number(line_speed));
+    ui->linespeed_spit->setValue(line_speed);
+    transmission->Send_cmd(0x12,line_speed);
+}
+
+void Widget::OnanglespeedSub1Click()
+{
+    angle_speed--;
+    if(angle_speed <= -100)
+        angle_speed = -100;
+    ui->angle_speed_value->setText(QString::number(angle_speed));
+    ui->anglespeed_spit->setValue(angle_speed);
+     transmission->Send_cmd(0x11,angle_speed);
+}
+
+void Widget::OnanglespeedSub10Click()
+{
+    angle_speed -= 10;
+    if(angle_speed <= -100)
+        angle_speed = -100;
+    ui->angle_speed_value->setText(QString::number(angle_speed));
+    ui->anglespeed_spit->setValue(angle_speed);
+     transmission->Send_cmd(0x11,angle_speed);
+}
+
+void Widget::LineEditChangeLineSpeed()
+{
+    line_speed = ui->line_speed_value->text().toInt();
+    ui->linespeed_spit->setValue(line_speed);
+     transmission->Send_cmd(0x12,line_speed);
+}
+
+void Widget::LineEditChangeAngleSpeed()
+{
+     angle_speed = ui->angle_speed_value->text().toInt();
+     ui->anglespeed_spit->setValue(angle_speed);
+     transmission->Send_cmd(0x11,angle_speed);
+}
+
+void Widget::SetLineSpeed(int value)
+{
+   line_speed = value;
+   ui->line_speed_value->setText(QString::number(line_speed));
+   transmission->Send_cmd(0x12,line_speed);
+
+}
+
+void Widget::SetAngleSpeed(int value)
+{
+    angle_speed = value;
+    ui->angle_speed_value->setText(QString::number(angle_speed));
+    transmission->Send_cmd(0x11,angle_speed);
 }
 
 void Widget::Dispaly_FeedBack()
@@ -477,8 +573,7 @@ void Widget::KeyChangeCtrlVal()
 
 void Widget::Enable_button(bool enable)
 {
-    ui->set_angle_speed->setEnabled(enable);
-    ui->set_line_speed->setEnabled(enable);
+
     ui->clean_battery_low_vol_error->setEnabled(enable);
     ui->clean_battery_over_vol_error->setEnabled(enable);
     ui->clean_motor_over_curr_error->setEnabled(enable);
@@ -490,6 +585,21 @@ void Widget::Enable_button(bool enable)
 
     ui->ctrl_mode->setEnabled(enable);
     ui->key_mouse_enable->setEnabled(enable);
+
+    ui->anglespeed_spit->setEnabled(enable);
+    ui->angle_speed_add1->setEnabled(enable);
+    ui->angle_speed_add10->setEnabled(enable);
+    ui->angle_speed_sub1->setEnabled(enable);
+    ui->angle_speed_sub10->setEnabled(enable);
+    ui->angle_speed_value->setEnabled(enable);
+
+    ui->linespeed_spit->setEnabled(enable);
+    ui->line_speed_add1->setEnabled(enable);
+    ui->line_speed_add10->setEnabled(enable);
+    ui->line_speed_sub1->setEnabled(enable);
+    ui->line_speed_sub10->setEnabled(enable);
+    ui->line_speed_value->setEnabled(enable);
+
 }
 
 Widget::ScanfSerialPort()
@@ -502,6 +612,7 @@ Widget::ScanfSerialPort()
          ui->PortNumber_3->clear();
          serila_num_curr = 0;
          ui->StartOrStopButton_3->setEnabled(false);
+          Enable_button(false);
     }
     else
     {
